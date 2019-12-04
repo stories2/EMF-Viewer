@@ -61,9 +61,9 @@ namespace emf_viewer
             int emfCnt;
             for(emfCnt = GetFastestFilteredIndexPoint(emf, 0); emfCnt < emf.Length; emfCnt ++)
             {
-                int currentType = BitConverter.ToInt32(emf.Skip(emfCnt).Take(4).ToArray(), 0);
+                int currentType = BitConverter.ToInt32(emf, emfCnt);
 
-                if (BitConverter.ToInt32(emf.Skip(emfCnt + 24).Take(4).ToArray(), 0) == 1)
+                if (BitConverter.ToInt32(emf, emfCnt + 24) == 1)
                 {
                     UInt32 emfTextSize;
                     int textLen;
@@ -73,15 +73,15 @@ namespace emf_viewer
                     {
                         // https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-emf/20eee81d-0bd4-42d1-a624-860adfe62358
                         case EMR_SMALLTEXTOUT:
-                            emfTextSize = BitConverter.ToUInt32(emf.Skip(emfCnt + 4).Take(4).ToArray(), 0);
-                            textLen = BitConverter.ToInt32(emf.Skip(emfCnt + 16).Take(4).ToArray(), 0) * 2;
+                            emfTextSize = BitConverter.ToUInt32(emf, emfCnt + 4);
+                            textLen = BitConverter.ToInt32(emf, emfCnt + 16) * 2;
                             text = System.Text.Encoding.Unicode.GetString(emf.Skip(emfCnt + (EMR_SMALLTEXTOUT_TEXT_POINT > 0 ? EMR_SMALLTEXTOUT_TEXT_POINT : 52) ).Take((int)textLen).ToArray());
                             bounds = new Rect()
                             {
-                                x1 = BitConverter.ToUInt32(emf.Skip(emfCnt + 8).Take(4).ToArray(), 0),
-                                y1 = BitConverter.ToUInt32(emf.Skip(emfCnt + 12).Take(4).ToArray(), 0),
-                                x2 = BitConverter.ToUInt32(emf.Skip(emfCnt + 28).Take(4).ToArray(), 0),
-                                y2 = BitConverter.ToUInt32(emf.Skip(emfCnt + 32).Take(4).ToArray(), 0),
+                                x1 = BitConverter.ToUInt32(emf, emfCnt + 8),
+                                y1 = BitConverter.ToUInt32(emf, emfCnt + 12),
+                                x2 = BitConverter.ToUInt32(emf, emfCnt + 28),
+                                y2 = BitConverter.ToUInt32(emf, emfCnt + 32),
                             };
 
                             if (text.Length > 0)
@@ -98,15 +98,15 @@ namespace emf_viewer
                             break;
                         // https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-emfspool/0af7426e-2767-4456-a4e2-6a57c8c640bd
                         case EMR_EXTTEXTOUTW:
-                            emfTextSize = BitConverter.ToUInt32(emf.Skip(emfCnt + 4).Take(4).ToArray(), 0);
-                            textLen = BitConverter.ToInt32(emf.Skip(emfCnt + 44).Take(4).ToArray(), 0) * 2;
+                            emfTextSize = BitConverter.ToUInt32(emf, emfCnt + 4);
+                            textLen = BitConverter.ToInt32(emf, emfCnt + 44) * 2;
                             text = System.Text.Encoding.Unicode.GetString(emf.Skip(emfCnt + (EMR_EXTTEXTOUTW_TEXT_POINT > 0 ? EMR_EXTTEXTOUTW_TEXT_POINT : 76)).Take((int)textLen).ToArray());
                             bounds = new Rect()
                             {
-                                x1 = BitConverter.ToUInt32(emf.Skip(emfCnt + 8).Take(4).ToArray(), 0),
-                                y1 = BitConverter.ToUInt32(emf.Skip(emfCnt + 12).Take(4).ToArray(), 0),
-                                x2 = BitConverter.ToUInt32(emf.Skip(emfCnt + 16).Take(4).ToArray(), 0),
-                                y2 = BitConverter.ToUInt32(emf.Skip(emfCnt + 20).Take(4).ToArray(), 0),
+                                x1 = BitConverter.ToUInt32(emf, emfCnt + 8),
+                                y1 = BitConverter.ToUInt32(emf, emfCnt + 12),
+                                x2 = BitConverter.ToUInt32(emf, emfCnt + 16),
+                                y2 = BitConverter.ToUInt32(emf, emfCnt + 20),
                             };
 
                             if (text.Length > 0)
@@ -147,12 +147,12 @@ namespace emf_viewer
 
         private EMF_Header GetHeader(byte[] spl)
         {
-            this.emfSP = BitConverter.ToInt32(spl.Skip(4).Take(4).ToArray(), 0);
+            this.emfSP = BitConverter.ToInt32(spl, 4);
             return new EMF_Header
             {
-                version = BitConverter.ToInt32(spl.Take(4).ToArray(), 0),
+                version = BitConverter.ToInt32(spl, 0),
                 emfSP = this.emfSP,
-                emfSize = BitConverter.ToInt32(spl.Skip(this.emfSP + 4).Take(4).ToArray(), 0)
+                emfSize = BitConverter.ToInt32(spl, this.emfSP + 4)
             };
         }
 
