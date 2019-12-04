@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace emf_viewer.Models
 {
-    class Rect
+    public class Rect
     {
         public UInt32 x1 { get; set; }
         public UInt32 y1 { get; set; }

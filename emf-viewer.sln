@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "emf-viewer", "emf-viewer.csproj", "{575B9559-01C0-4C7A-8B3D-10346684A41B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TESTER", "TESTER\TESTER.csproj", "{3C625717-71B6-4911-A3BD-C23B7BC1061B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{575B9559-01C0-4C7A-8B3D-10346684A41B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{575B9559-01C0-4C7A-8B3D-10346684A41B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{575B9559-01C0-4C7A-8B3D-10346684A41B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C625717-71B6-4911-A3BD-C23B7BC1061B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C625717-71B6-4911-A3BD-C23B7BC1061B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C625717-71B6-4911-A3BD-C23B7BC1061B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C625717-71B6-4911-A3BD-C23B7BC1061B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
