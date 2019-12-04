@@ -10,6 +10,9 @@ namespace emf_viewer
 {
     public class EMF_Manager
     {
+        private const int EMR_SMALLTEXTOUT = 108, EMR_EXTTEXTOUTW = 84;
+        public int EMR_SMALLTEXTOUT_TEXT_POINT { get; set; }
+        public int EMR_EXTTEXTOUTW_TEXT_POINT { get; set; }
         private string targetFile;
 
         public List<EMF_Filter> filterList { get; set; }
@@ -62,25 +65,43 @@ namespace emf_viewer
 
                 if (BitConverter.ToInt32(emf.Skip(emfCnt + 24).Take(4).ToArray(), 0) == 1)
                 {
-                    foreach (EMF_Filter filter in filterList)
+                    UInt32 emfTextSize;
+                    int textLen;
+                    string text;
+                    Rect bounds;
+                    switch (currentType)
                     {
-                        if (BitConverter.ToInt32(filter.type, 0) == currentType)
-                        {
-                            UInt32 emfTextSize = BitConverter.ToUInt32(emf.Skip(emfCnt + 4).Take(4).ToArray(), 0);
-                            int textLen = 0;
-                            string text = null;
+                        // https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-emf/20eee81d-0bd4-42d1-a624-860adfe62358
+                        case EMR_SMALLTEXTOUT:
+                            emfTextSize = BitConverter.ToUInt32(emf.Skip(emfCnt + 4).Take(4).ToArray(), 0);
+                            textLen = BitConverter.ToInt32(emf.Skip(emfCnt + 16).Take(4).ToArray(), 0) * 2;
+                            text = System.Text.Encoding.Unicode.GetString(emf.Skip(emfCnt + (EMR_SMALLTEXTOUT_TEXT_POINT > 0 ? EMR_SMALLTEXTOUT_TEXT_POINT : 52) ).Take((int)textLen).ToArray());
+                            bounds = new Rect()
+                            {
+                                x1 = BitConverter.ToUInt32(emf.Skip(emfCnt + 8).Take(4).ToArray(), 0),
+                                y1 = BitConverter.ToUInt32(emf.Skip(emfCnt + 12).Take(4).ToArray(), 0),
+                                x2 = BitConverter.ToUInt32(emf.Skip(emfCnt + 28).Take(4).ToArray(), 0),
+                                y2 = BitConverter.ToUInt32(emf.Skip(emfCnt + 32).Take(4).ToArray(), 0),
+                            };
 
-                            if (filter.parseLen > 0)
-                                textLen = filter.parseLen;
-                            else
-                                textLen = BitConverter.ToInt32(emf.Skip(emfCnt + 44).Take(4).ToArray(), 0) * 2;
-
-                            if (filter.parsePoint > 0)
-                                text = System.Text.Encoding.Unicode.GetString(emf.Skip(emfCnt + filter.parsePoint).Take((int)textLen).ToArray());
-                            else
-                                text = System.Text.Encoding.Unicode.GetString(emf.Skip(emfCnt + 76).Take((int)textLen).ToArray());
-
-                            Rect bounds = new Rect()
+                            if (text.Length > 0)
+                            {
+                                dataList.Add(new EMF_Data
+                                {
+                                    areaType = currentType,
+                                    bounds = bounds,
+                                    size = emfTextSize,
+                                    sp = emfCnt,
+                                    text = text
+                                });
+                            }
+                            break;
+                        // https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-emfspool/0af7426e-2767-4456-a4e2-6a57c8c640bd
+                        case EMR_EXTTEXTOUTW:
+                            emfTextSize = BitConverter.ToUInt32(emf.Skip(emfCnt + 4).Take(4).ToArray(), 0);
+                            textLen = BitConverter.ToInt32(emf.Skip(emfCnt + 44).Take(4).ToArray(), 0) * 2;
+                            text = System.Text.Encoding.Unicode.GetString(emf.Skip(emfCnt + (EMR_EXTTEXTOUTW_TEXT_POINT > 0 ? EMR_EXTTEXTOUTW_TEXT_POINT : 76)).Take((int)textLen).ToArray());
+                            bounds = new Rect()
                             {
                                 x1 = BitConverter.ToUInt32(emf.Skip(emfCnt + 8).Take(4).ToArray(), 0),
                                 y1 = BitConverter.ToUInt32(emf.Skip(emfCnt + 12).Take(4).ToArray(), 0),
@@ -99,7 +120,7 @@ namespace emf_viewer
                                     text = text
                                 });
                             }
-                        }
+                            break;
                     }
                 }
                 emfCnt = GetFastestFilteredIndexPoint(emf, emfCnt + 1) - 1;

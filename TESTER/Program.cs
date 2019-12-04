@@ -18,9 +18,14 @@ namespace TESTER
             EMF_Manager manager = new EMF_Manager();
 
             manager.SetTargetFile("00002.SPL");
+            manager.EMR_SMALLTEXTOUT_TEXT_POINT = 36;
             manager.filterList.Add(new EMF_Filter
             {
                 type = new byte[] { 84, 0, 0, 0 },
+            });
+            manager.filterList.Add(new EMF_Filter
+            {
+                type = new byte[] { 108, 0, 0, 0 },
             });
             dataList = manager.Anal(out e);
 
