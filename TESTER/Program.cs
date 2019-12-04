@@ -22,6 +22,7 @@ namespace TESTER
             {
                 type = new byte[] { 84, 0, 0, 0 },
             });
+            dataList = manager.Anal(out e);
 
             using (TextWriter tw = new StreamWriter("report.csv"))
             {
